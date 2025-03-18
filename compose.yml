@@ -1,0 +1,36 @@
+name: bookstore-api-app
+services:
+  bookstore:
+    image: bookstore-api:latest #first time build image by "docker build -t bookstore-api:latest ." command  on your local.
+    networks:
+      - books-net
+    ports:
+      - 80:80
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Qq123456
+      MYSQL_DATABASE: bookstore_db
+      MYSQL_USER: clarusway
+      MYSQL_PASSWORD: Clarusway_1
+    volumes:
+      - mysql-vol:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3306"]
+      # test: ["CMD", "mysqladmin", "ping", "-h", "database", "-u", "root"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    networks:
+      - books-net
+
+networks:
+  books-net:
+volumes:
+  mysql-vol:
